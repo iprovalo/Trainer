@@ -496,7 +496,7 @@ class Trainer:
 
         # DISTRIBUTED
         if self.num_gpus > 1:
-            self.model = DDP_th(self.model, device_ids=[args.rank], output_device=args.rank)
+            self.model = nn.DataParallel(self.model, device_ids=[args.rank], output_device=args.rank)
 
         # count model size
         num_params = count_parameters(self.model)
@@ -1726,7 +1726,11 @@ class Trainer:
 
         # return if target loss defined in the model config
         if "target_loss" in self.config and self.config.target_loss:
-            return keep_avg_target[f"avg_{self.config.target_loss}"]
+            if f"avg_{self.config.target_loss}" in keep_avg_target.avg_values.keys():
+                return keep_avg_target[f"avg_{self.config.target_loss}"]
+            else:
+                print(keep_avg_target.avg_values.keys())
+                return keep_avg_target[f"avg_loss_1"]
 
         # take the average of loss_{optimizer_idx} as the target loss when there are multiple optimizers
         if isinstance(self.optimizer, list):
