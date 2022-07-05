@@ -1715,7 +1715,11 @@ class Trainer:
 
         # return if target loss defined in the model config
         if "target_loss" in self.config and self.config.target_loss:
-            return keep_avg_target[f"avg_{self.config.target_loss}"]
+            if f"avg_{self.config.target_loss}" in keep_avg_target.avg_values.keys():
+                return keep_avg_target[f"avg_{self.config.target_loss}"]
+            else:
+                print(keep_avg_target.avg_values.keys())
+                return keep_avg_target[f"avg_loss_1"]
 
         # take the average of loss_{optimizer_idx} as the target loss when there are multiple optimizers
         if isinstance(self.optimizer, list):
